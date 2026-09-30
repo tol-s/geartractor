@@ -1,0 +1,162 @@
+@import "tailwindcss";
+@import "tw-animate-css";
+
+/*
+ * Gear Tractor design system.
+ * Tenant branding is injected at runtime as --brand / --brand-2 / --brand-3 (see BrandStyle).
+ * Action colours map to tenant branding: Checkout = primary, Reserve = secondary, Check In = accent.
+ */
+
+:root {
+  --brand: #ff6b1a;
+  --brand-2: #2563eb;
+  --brand-3: #e11d74;
+
+  --canvas: #f6f5f2;
+  --surface: #ffffff;
+  --surface-2: #faf9f7;
+  --ink: #0b0b0f;
+  --ink-2: #3a3a44;
+  --muted: #6b6b76;
+  --line: #e9e7e2;
+  --line-2: #dcd9d2;
+  --sidebar: #0b0b0f;
+  --warm: #f3efe8;
+
+  --available: #16a34a;
+  --inspection: #f59e0b;
+  --missing: #ef4444;
+  --rejected: #991b1b;
+  --checked-out: #2563eb;
+  --reserved: #7c3aed;
+  --consumable: #f97316;
+  --assigned: #475569;
+}
+
+@theme inline {
+  --color-brand: var(--brand);
+  --color-brand-2: var(--brand-2);
+  --color-brand-3: var(--brand-3);
+  --color-checkout: var(--brand);
+  --color-reserve: var(--brand-2);
+  --color-checkin: var(--brand-3);
+
+  --color-canvas: var(--canvas);
+  --color-surface: var(--surface);
+  --color-surface-2: var(--surface-2);
+  --color-ink: var(--ink);
+  --color-ink-2: var(--ink-2);
+  --color-muted: var(--muted);
+  --color-line: var(--line);
+  --color-line-2: var(--line-2);
+  --color-sidebar: var(--sidebar);
+  --color-warm: var(--warm);
+
+  --color-available: var(--available);
+  --color-inspection: var(--inspection);
+  --color-missing: var(--missing);
+  --color-rejected: var(--rejected);
+  --color-checked-out: var(--checked-out);
+  --color-reserved: var(--reserved);
+  --color-consumable: var(--consumable);
+  --color-assigned: var(--assigned);
+
+  --font-sans: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, monospace;
+
+  --radius-card: 20px;
+  --radius-tile: 28px;
+
+  --shadow-card: 0 1px 2px rgb(11 11 15 / 0.04), 0 4px 16px -4px rgb(11 11 15 / 0.06);
+  --shadow-lift: 0 2px 4px rgb(11 11 15 / 0.05), 0 18px 40px -12px rgb(11 11 15 / 0.18);
+  --shadow-float: 0 10px 30px -8px rgb(11 11 15 / 0.35);
+
+  --animate-shimmer: shimmer 1.6s linear infinite;
+  --animate-scanline: scanline 2.2s ease-in-out infinite;
+
+  @keyframes shimmer {
+    0% {
+      background-position: -400px 0;
+    }
+    100% {
+      background-position: 400px 0;
+    }
+  }
+  @keyframes scanline {
+    0%,
+    100% {
+      top: 0%;
+    }
+    50% {
+      top: calc(100% - 4px);
+    }
+  }
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    text-rendering: optimizeLegibility;
+  }
+  body {
+    background: var(--canvas);
+    color: var(--ink);
+    font-family: var(--font-sans);
+    font-feature-settings: "ss01", "cv11";
+  }
+  :focus-visible {
+    outline: 2px solid var(--brand);
+    outline-offset: 2px;
+    border-radius: 8px;
+  }
+  ::selection {
+    background: color-mix(in oklab, var(--brand) 25%, transparent);
+  }
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"] {
+    min-height: 44px;
+  }
+}
+
+@layer components {
+  .tabular {
+    font-variant-numeric: tabular-nums;
+  }
+  .skeleton {
+    background: linear-gradient(90deg, #eeece8 0px, #f7f6f3 120px, #eeece8 240px);
+    background-size: 800px 100%;
+    animation: var(--animate-shimmer);
+  }
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    scrollbar-width: none;
+  }
+  .pb-safe {
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .grid-dots {
+    background-image: radial-gradient(rgb(255 255 255 / 0.12) 1px, transparent 1px);
+    background-size: 22px 22px;
+  }
+}
+
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  body {
+    background: white;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    transition-duration: 0.01ms !important;
+  }
+}

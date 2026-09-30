@@ -1,0 +1,3 @@
+DROP INDEX "checkout_items_unique";--> statement-breakpoint
+CREATE UNIQUE INDEX "checkout_items_root_unique" ON "checkout_items" USING btree ("checkout_id","inventory_item_id") WHERE "checkout_items"."parent_checkout_item_id" IS NULL;--> statement-breakpoint
+CREATE UNIQUE INDEX "checkout_items_tracked_unique" ON "checkout_items" USING btree ("checkout_id","inventory_item_id") WHERE "checkout_items"."is_tracked";
