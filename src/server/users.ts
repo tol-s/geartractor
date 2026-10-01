@@ -1,4 +1,5 @@
 import { and, asc, eq, isNull, ne, sql } from "drizzle-orm";
+import { Q } from "@/db/columns";
 import { z } from "zod";
 import type { Tx } from "@/db/tenant";
 import { invitations, sessions, users } from "@/db/schema";
@@ -29,7 +30,7 @@ export async function listUsers(tx: Tx, orgId: string) {
       status: users.status,
       lastActiveAt: users.lastActiveAt,
       createdAt: users.createdAt,
-      inviteExpiresAt: sql<string | null>`(select max(expires_at)::text from invitations iv where iv.user_id = ${users.id} and iv.accepted_at is null and iv.revoked_at is null)`,
+      inviteExpiresAt: sql<string | null>`(select max(expires_at)::text from invitations iv where iv.user_id = ${Q.userId} and iv.accepted_at is null and iv.revoked_at is null)`,
     })
     .from(users)
     .where(eq(users.organizationId, orgId))

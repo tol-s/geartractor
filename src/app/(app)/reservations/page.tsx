@@ -57,7 +57,7 @@ export default async function ReservationsPage(props: PageProps<"/reservations">
               <li key={r.id}>
                 <Link
                   href={`/reservations/${r.id}`}
-                  className="group flex h-full gap-4 rounded-[var(--radius-card)] border border-line bg-surface p-4 shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]"
+                  className="group flex h-full gap-4 rounded-[var(--radius-card)] border border-line bg-surface p-4 transition-all"
                 >
                   <span className="flex w-14 shrink-0 flex-col items-center justify-center rounded-2xl bg-reserve/10 py-2 text-reserve">
                     <span className="text-[11px] font-bold uppercase">{d.toLocaleDateString("en-GB", { month: "short" })}</span>

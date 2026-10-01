@@ -1,4 +1,5 @@
 import { and, desc, eq, gte, inArray, isNull, sql } from "drizzle-orm";
+import { Q } from "@/db/columns";
 import type { Tx } from "@/db/tenant";
 import { checkouts, inventoryItems, locations, reservations, users } from "@/db/schema";
 import { CHECKOUT_STEPS } from "@/lib/domain";
@@ -25,7 +26,7 @@ export async function getDashboard(tx: Tx, ctx: Ctx) {
       dueAt: checkouts.dueAt,
       locationName: locations.name,
       userName: users.name,
-      itemsOut: sql<number>`(select count(*)::int from checkout_items ci where ci.checkout_id = ${checkouts.id} and ci.status = 'issued' and ci.parent_checkout_item_id is null)`,
+      itemsOut: sql<number>`(select count(*)::int from checkout_items ci where ci.checkout_id = ${Q.checkoutId} and ci.status = 'issued' and ci.parent_checkout_item_id is null)`,
     })
     .from(checkouts)
     .leftJoin(locations, eq(locations.id, checkouts.locationId))
@@ -47,7 +48,7 @@ export async function getDashboard(tx: Tx, ctx: Ctx) {
       currentStep: checkouts.currentStep,
       updatedAt: checkouts.updatedAt,
       locationName: locations.name,
-      items: sql<number>`(select count(*)::int from checkout_items ci where ci.checkout_id = ${checkouts.id})`,
+      items: sql<number>`(select count(*)::int from checkout_items ci where ci.checkout_id = ${Q.checkoutId})`,
     })
     .from(checkouts)
     .leftJoin(locations, eq(locations.id, checkouts.locationId))
@@ -61,8 +62,20 @@ export async function getDashboard(tx: Tx, ctx: Ctx) {
       missing: sql<number>`count(*) filter (where ${inventoryItems.status} = 'missing')::int`,
       rejected: sql<number>`count(*) filter (where ${inventoryItems.status} = 'rejected')::int`,
       lowStock: sql<number>`count(*) filter (where ${inventoryItems.kind} = 'consumable' and ${inventoryItems.reorderThreshold} is not null and exists (
-        select 1 from consumable_stock cs where cs.inventory_item_id = ${inventoryItems.id}
+        select 1 from consumable_stock cs where cs.inventory_item_id = ${Q.itemId}
         and (cs.total_quantity - cs.allocated_quantity - cs.issued_quantity) < ${inventoryItems.reorderThreshold}))::int`,
+    })
+    .from(inventoryItems)
+    .where(and(eq(inventoryItems.organizationId, ctx.orgId), isNull(inventoryItems.archivedAt)));
+
+  const [stats] = await tx
+    .select({
+      total: sql<number>`count(*)::int`,
+      available: sql<number>`count(*) filter (where ${inventoryItems.effectiveStatus} = 'available' and not exists (
+        select 1 from checkout_items ci where ci.inventory_item_id = ${Q.itemId} and ci.status = 'issued' and ci.is_tracked))::int`,
+      checkedOut: sql<number>`count(*) filter (where exists (
+        select 1 from checkout_items ci where ci.inventory_item_id = ${Q.itemId} and ci.status = 'issued' and ci.is_tracked))::int`,
+      attention: sql<number>`count(*) filter (where ${inventoryItems.effectiveStatus} <> 'available')::int`,
     })
     .from(inventoryItems)
     .where(and(eq(inventoryItems.organizationId, ctx.orgId), isNull(inventoryItems.archivedAt)));
@@ -92,7 +105,7 @@ export async function getDashboard(tx: Tx, ctx: Ctx) {
       ),
     )
     .orderBy(reservations.startsAt)
-    .limit(3);
+    .limit(5);
 
   const stepLabel = draft ? CHECKOUT_STEPS[Math.min(Math.max(draft.currentStep, 1), 4) - 1].label : null;
 
@@ -116,6 +129,13 @@ export async function getDashboard(tx: Tx, ctx: Ctx) {
       overdue: Number(overdue),
     },
     upcoming,
+    stats: {
+      total: Number(stats?.total ?? 0),
+      available: Number(stats?.available ?? 0),
+      checkedOut: Number(stats?.checkedOut ?? 0),
+      attention: Number(stats?.attention ?? 0),
+    },
+    orgName: ctx.org.name,
   };
 }
 

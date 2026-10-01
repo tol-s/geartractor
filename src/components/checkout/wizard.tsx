@@ -321,7 +321,7 @@ function LocationStep({
                 selected === l.id ? "border-brand bg-brand/[0.06]" : "border-line hover:border-line-2",
               )}
             >
-              <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-xl", selected === l.id ? "bg-brand text-white" : "bg-reserve/10 text-reserve")}>
+              <span className={cn("flex size-10 shrink-0 items-center justify-center rounded-xl", selected === l.id ? "bg-brand text-white" : "bg-reserve text-white")}>
                 <MapPin className="size-5" />
               </span>
               <span className="min-w-0 flex-1">
@@ -422,7 +422,7 @@ function EquipmentStep({
         )}
         {mode === "scan" && (
           <Card className="flex flex-col items-center p-8 text-center">
-            <span className="flex size-16 items-center justify-center rounded-3xl bg-brand text-white shadow-[0_12px_28px_-10px_var(--brand)]">
+            <span className="flex size-16 items-center justify-center rounded-3xl bg-brand text-white">
               <ScanLine className="size-8" />
             </span>
             <p className="mt-4 text-[15px] font-semibold">Scan equipment QR codes</p>
@@ -820,7 +820,7 @@ function CheckoutSuccess({ checkoutId, code, itemCount }: { checkoutId: string; 
           initial={{ scale: 0, rotate: -30 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: "spring", stiffness: 260, damping: 16 }}
-          className="flex size-24 items-center justify-center rounded-[32px] bg-available text-white shadow-[0_20px_40px_-12px_rgb(22_163_74/0.6)]"
+          className="flex size-24 items-center justify-center rounded-[32px] bg-available text-white"
         >
           <Check className="size-12" strokeWidth={3} />
         </motion.div>

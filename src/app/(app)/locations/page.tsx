@@ -28,9 +28,9 @@ export default async function LocationsPage() {
             const s = stats.get(l.id);
             return (
               <li key={l.id}>
-                <Link href={`/locations/${l.id}`} className="group block h-full rounded-[var(--radius-card)] border border-line bg-surface p-5 shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]">
+                <Link href={`/locations/${l.id}`} className="group block h-full rounded-[var(--radius-card)] border border-line bg-surface p-5 transition-all">
                   <div className="flex items-start gap-3">
-                    <span className="flex size-11 items-center justify-center rounded-2xl bg-reserve/10 text-reserve">
+                    <span className="flex size-11 items-center justify-center rounded-2xl bg-reserve text-white">
                       <MapPin className="size-5" />
                     </span>
                     <div className="min-w-0 flex-1">

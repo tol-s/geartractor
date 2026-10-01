@@ -21,17 +21,17 @@ export default async function ActivityPage() {
     feed: await recentActivity(tx, ctx.orgId, { userId: ctx.can("audit.view") ? undefined : ctx.user.id, limit: 30 }),
   }));
   const links = [
-    { href: "/checkouts", label: "Checkouts", icon: PackageOpen, tone: "bg-brand/10 text-brand" },
-    { href: "/check-in", label: "Check In", icon: PackageCheck, tone: "bg-checkin/10 text-checkin" },
-    { href: "/reservations", label: "Reservations", icon: CalendarClock, tone: "bg-reserve/10 text-reserve" },
-    { href: "/inspections", label: "Inspections", icon: ClipboardCheck, tone: "bg-inspection/12 text-[#b45309]" },
+    { href: "/checkouts", label: "Checkouts", icon: PackageOpen, tone: "bg-brand text-white" },
+    { href: "/check-in", label: "Check In", icon: PackageCheck, tone: "bg-checkin text-white" },
+    { href: "/reservations", label: "Reservations", icon: CalendarClock, tone: "bg-reserve text-white" },
+    { href: "/inspections", label: "Inspections", icon: ClipboardCheck, tone: "bg-inspection text-white" },
   ];
   return (
     <div className="space-y-7">
       <PageHeader title="Activity" subtitle="Sessions, reservations and recent changes" />
       <div className="grid grid-cols-2 gap-3 md:grid-cols-4">
         {links.map((l) => (
-          <Link key={l.href} href={l.href} className="flex items-center gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4 shadow-[var(--shadow-card)] active:scale-[0.98]">
+          <Link key={l.href} href={l.href} className="flex items-center gap-3 rounded-[var(--radius-card)] border border-line bg-surface p-4 active:scale-[0.98]">
             <span className={`flex size-10 items-center justify-center rounded-xl ${l.tone}`}>
               <l.icon className="size-5" />
             </span>

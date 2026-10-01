@@ -36,7 +36,7 @@ export function CheckInHub({ sessions }: { sessions: Session[] }) {
         whileHover={{ y: -3 }}
         whileTap={{ scale: 0.98 }}
         onClick={() => setScanOpen(true)}
-        className="relative mb-8 flex w-full items-center gap-4 overflow-hidden rounded-[var(--radius-tile)] bg-checkin p-5 text-left text-white shadow-[0_18px_40px_-18px_var(--brand-3)] md:p-6"
+        className="relative mb-8 flex w-full items-center gap-4 overflow-hidden rounded-[var(--radius-tile)] bg-checkin p-5 text-left text-white md:p-6"
       >
         <span className="grid-dots pointer-events-none absolute inset-0 opacity-60" aria-hidden />
         <span className="relative flex size-14 shrink-0 items-center justify-center rounded-[18px] bg-white/20 ring-1 ring-white/25">
@@ -58,7 +58,7 @@ export function CheckInHub({ sessions }: { sessions: Session[] }) {
             const overdue = Boolean(s.dueAt && new Date(s.dueAt) < new Date());
             return (
               <li key={s.id}>
-                <Link href={`/checkouts/${s.id}/return`} className="group flex h-full flex-col rounded-[var(--radius-card)] border border-line bg-surface p-4 shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)]">
+                <Link href={`/checkouts/${s.id}/return`} className="group flex h-full flex-col rounded-[var(--radius-card)] border border-line bg-surface p-4 transition-all">
                   <div className="flex items-center justify-between gap-2">
                     <span className="flex items-center gap-1.5 text-[14px] font-semibold">
                       <MapPin className="size-4 text-reserve" /> {s.locationName}

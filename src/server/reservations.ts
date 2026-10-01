@@ -1,4 +1,5 @@
 import { and, asc, desc, eq, gte, inArray, isNull, lt, or, sql, type SQL } from "drizzle-orm";
+import { Q } from "@/db/columns";
 import type { Tx } from "@/db/tenant";
 import {
   checkouts,
@@ -124,7 +125,7 @@ export async function searchReservationCandidates(
   const where: SQL[] = [eq(inventoryItems.organizationId, ctx.orgId), isNull(inventoryItems.archivedAt)];
   if (f.kind && f.kind !== "all") where.push(eq(inventoryItems.kind, f.kind));
   if (like) where.push(sql`(${inventoryItems.code} ilike ${like} or ${inventoryItems.name} ilike ${like})`);
-  where.push(sql`not exists (select 1 from assignments a where a.child_item_id = ${inventoryItems.id} and a.unassigned_at is null)`);
+  where.push(sql`not exists (select 1 from assignments a where a.child_item_id = ${Q.itemId} and a.unassigned_at is null)`);
   const rows = await tx
     .select({
       id: inventoryItems.id,
@@ -349,7 +350,7 @@ export async function listReservations(
       status: reservations.status,
       locationName: locations.name,
       userName: users.name,
-      itemCount: sql<number>`(select count(*)::int from reservation_items ri where ri.reservation_id = ${reservations.id})`,
+      itemCount: sql<number>`(select count(*)::int from reservation_items ri where ri.reservation_id = ${Q.reservationId})`,
     })
     .from(reservations)
     .leftJoin(locations, eq(locations.id, reservations.locationId))

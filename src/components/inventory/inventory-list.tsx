@@ -148,7 +148,7 @@ export async function InventoryList({
       ) : (
         <>
           {/* Desktop table */}
-          <div className="hidden overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface shadow-[var(--shadow-card)] md:block">
+          <div className="hidden overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface md:block">
             <div className="relative overflow-x-auto">
               <table className="w-full min-w-[1180px] border-collapse text-left text-[13.5px]">
                 <thead>
@@ -219,7 +219,7 @@ export async function InventoryList({
           {/* Mobile cards */}
           <ul className="space-y-3 md:hidden">
             {result.rows.map((r) => (
-              <li key={r.id} className="rounded-[var(--radius-card)] border border-line bg-surface p-4 shadow-[var(--shadow-card)]">
+              <li key={r.id} className="rounded-[var(--radius-card)] border border-line bg-surface p-4">
                 <div className="flex items-start gap-3">
                   <KindIcon kind={r.kind} size={44} />
                   <Link href={`/inventory/${r.id}`} className="min-w-0 flex-1">

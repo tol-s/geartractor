@@ -52,6 +52,7 @@ pnpm install
 cp .env.example .env            # fill in values (see below)
 pnpm db:setup                   # migrations + RLS-restricted role (needs DATABASE_URL_OWNER + APP_DB_PASSWORD)
 pnpm db:seed                    # demo data (use --reset to wipe and reseed)
+pnpm db:seed:bulk               # optional: lots more demo data for every page and role
 pnpm dev
 ```
 
@@ -79,14 +80,30 @@ The seed creates the **Gear Tractor** organization (Alberta timezone) and a seco
 * Records with every status: an expired helmet, an overdue carabiner, a flagged harness, a missing carabiner, a rejected rope and an item with missing expiry information
 * Two active sessions (including "Corporate Gala – TechCorp" at Lock-Up A, one of them overdue), one in-progress checkout (Step 2 of 4), reservations, inspection history and a returned checkout
 
-| Role | Email |
-| --- | --- |
-| Super Admin | `super@geartractor.app` |
-| Organization Admin | `dj@geartractor.app` (DJ Fernandez) |
-| Trainer/User | `sam@geartractor.app`, `maya@geartractor.app` |
-| Tegnol Admin | `admin@tegnol.agency` |
+### Bulk demo data
 
-All demo accounts use `SEED_DEMO_PASSWORD`.
+`pnpm db:seed:bulk` (also run automatically on deploy, once) adds a realistic history on top of the base seed so every page and role has plenty to look at: 13 users and 8 locations at Gear Tractor, about 250 inventory records, 12 Configurations, 6 Kits, 30 Consumables, around 50 returned checkouts with damage reports, 16 active sessions (some overdue or partially returned), drafts at every step, 24 reservations, inspection history, photos and PDF attachments, plus two more tenants: **Summit Arborists** and **Northwind Rescue** (inactive). It is additive and skips itself if it has already run.
+
+### Demo accounts
+
+| Password | Where |
+| --- | --- |
+| `GearTractor-Demo-2026` | Production (https://geartractor.vercel.app) |
+| `GearTractor!2026` | Local (`.env` `SEED_DEMO_PASSWORD`) |
+
+Every account below uses the same password. Change `SEED_DEMO_PASSWORD` before seeding a real environment.
+
+| Organization | Role | Accounts |
+| --- | --- | --- |
+| Platform | Super Admin | `super@geartractor.app` |
+| Gear Tractor | Organization Admin | `dj@geartractor.app` (DJ Fernandez), `priya@geartractor.app` (Priya Nair) |
+| Gear Tractor | Trainer | `sam@`, `maya@`, `liam@`, `aisha@`, `noah@`, `chloe@`, `ethan@`, `zara@geartractor.app` |
+| Gear Tractor | Invited / deactivated | `jordan@`, `owen@geartractor.app` (invited, no password yet), `grace@geartractor.app` (deactivated, cannot sign in) |
+| Tegnol | Organization Admin | `admin@tegnol.agency` (Talha S.), `hira@tegnol.agency` |
+| Tegnol | Trainer | `bilal@`, `sana@`, `usman@tegnol.agency` (`ayesha@tegnol.agency` is invited) |
+| Summit Arborists | Organization Admin | `marcus@summitarborists.ca` |
+| Summit Arborists | Trainer | `elena@`, `ravi@summitarborists.ca` |
+| Northwind Rescue | Organization Admin | `fiona@northwindrescue.co.uk` (organization is inactive, so sign-in is blocked) |
 
 ## Quality checks
 

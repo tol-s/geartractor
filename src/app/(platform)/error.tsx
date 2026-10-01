@@ -6,7 +6,7 @@ import { RotateCcw, TriangleAlert } from "lucide-react";
 export default function AppError({ reset }: { error: Error & { digest?: string }; reset: () => void }) {
   return (
     <div className="flex min-h-[60dvh] flex-col items-center justify-center px-6 text-center">
-      <span className="mb-5 flex size-16 items-center justify-center rounded-3xl bg-missing/10 text-missing">
+      <span className="mb-5 flex size-16 items-center justify-center rounded-3xl bg-missing text-white">
         <TriangleAlert className="size-8" />
       </span>
       <h1 className="text-[22px] font-bold tracking-tight">Something went wrong</h1>

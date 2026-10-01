@@ -75,7 +75,7 @@ export function ReturnSheet({ detail, focusLine }: { detail: CheckoutDetail; foc
           initial={{ scale: 0 }}
           animate={{ scale: 1 }}
           transition={{ type: "spring", stiffness: 260, damping: 16 }}
-          className="flex size-24 items-center justify-center rounded-[32px] bg-checkin text-white shadow-[0_20px_40px_-12px_var(--brand-3)]"
+          className="flex size-24 items-center justify-center rounded-[32px] bg-checkin text-white"
         >
           <PackageCheck className="size-12" />
         </motion.div>

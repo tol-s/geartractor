@@ -60,7 +60,7 @@ export default async function CheckoutsPage(props: PageProps<"/checkouts">) {
             const href = r.status === "draft" ? `/checkouts/${r.id}/edit` : `/checkouts/${r.id}`;
             return (
               <li key={r.id}>
-                <Link href={href} className="group flex h-full flex-col rounded-[var(--radius-card)] border border-line bg-surface p-4 shadow-[var(--shadow-card)] transition-all hover:-translate-y-0.5 hover:shadow-[var(--shadow-lift)] md:p-5">
+                <Link href={href} className="group flex h-full flex-col rounded-[var(--radius-card)] border border-line bg-surface p-4 transition-all md:p-5">
                   <div className="flex items-center justify-between gap-2">
                     <span className="font-mono text-[12.5px] font-semibold text-muted">{r.code}</span>
                     <CheckoutStatusBadge status={r.status} overdue={overdue} />

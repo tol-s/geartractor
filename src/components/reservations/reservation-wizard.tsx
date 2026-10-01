@@ -66,7 +66,7 @@ export function ReservationWizard({
           initial={{ scale: 0, rotate: 20 }}
           animate={{ scale: 1, rotate: 0 }}
           transition={{ type: "spring", stiffness: 260, damping: 16 }}
-          className="flex size-24 items-center justify-center rounded-[32px] bg-reserve text-white shadow-[0_20px_40px_-12px_var(--brand-2)]"
+          className="flex size-24 items-center justify-center rounded-[32px] bg-reserve text-white"
         >
           <CalendarCheck2 className="size-12" />
         </motion.div>

@@ -1,4 +1,5 @@
 import { and, asc, desc, eq, inArray, isNull, isNotNull, sql, type SQL } from "drizzle-orm";
+import { Q } from "@/db/columns";
 import { alias } from "drizzle-orm/pg-core";
 import { sequential, type Tx } from "@/db/tenant";
 import {
@@ -53,16 +54,16 @@ export function availabilitySql() {
   return {
     checkedOutCode: sql<string | null>`(
       select c.code from checkout_items ci join checkouts c on c.id = ci.checkout_id
-      where ci.inventory_item_id = ${inventoryItems.id} and ci.status = 'issued' and ci.is_tracked
+      where ci.inventory_item_id = ${Q.itemId} and ci.status = 'issued' and ci.is_tracked
       limit 1)`,
     reservedUntil: sql<string | null>`(
       select min(ri.starts_at)::text from reservation_items ri
-      where ri.inventory_item_id = ${inventoryItems.id} and ri.active and ri.ends_at > now())`,
+      where ri.inventory_item_id = ${Q.itemId} and ri.active and ri.ends_at > now())`,
     stockUnallocated: sql<number | null>`(
       select (cs.total_quantity - cs.allocated_quantity - cs.issued_quantity)::float8 from consumable_stock cs
-      where cs.inventory_item_id = ${inventoryItems.id})`,
+      where cs.inventory_item_id = ${Q.itemId})`,
     stockTotal: sql<number | null>`(
-      select cs.total_quantity::float8 from consumable_stock cs where cs.inventory_item_id = ${inventoryItems.id})`,
+      select cs.total_quantity::float8 from consumable_stock cs where cs.inventory_item_id = ${Q.itemId})`,
   };
 }
 
@@ -79,30 +80,30 @@ function buildWhere(orgId: string, f: InventoryFilters): SQL[] {
       or ${inventoryItems.serialNumber} ilike ${like} or ${inventoryItems.techSpec} ilike ${like}
       or ${inventoryItems.manufacturer} ilike ${like}
       or exists (select 1 from inventory_item_tags it join inventory_tags t on t.id = it.tag_id
-                 where it.item_id = ${inventoryItems.id} and t.name ilike ${like})
+                 where it.item_id = ${Q.itemId} and t.name ilike ${like})
     )`);
   }
   if (f.tag) {
     where.push(sql`exists (select 1 from inventory_item_tags it join inventory_tags t on t.id = it.tag_id
-      where it.item_id = ${inventoryItems.id} and lower(t.name) = lower(${f.tag}))`);
+      where it.item_id = ${Q.itemId} and lower(t.name) = lower(${f.tag}))`);
   }
   switch (f.availability) {
     case "checked_out":
-      where.push(sql`exists (select 1 from checkout_items ci where ci.inventory_item_id = ${inventoryItems.id} and ci.status = 'issued')`);
+      where.push(sql`exists (select 1 from checkout_items ci where ci.inventory_item_id = ${Q.itemId} and ci.status = 'issued')`);
       break;
     case "reserved":
       where.push(
-        sql`exists (select 1 from reservation_items ri where ri.inventory_item_id = ${inventoryItems.id} and ri.active and ri.ends_at > now())`,
+        sql`exists (select 1 from reservation_items ri where ri.inventory_item_id = ${Q.itemId} and ri.active and ri.ends_at > now())`,
       );
       break;
     case "assigned":
-      where.push(sql`exists (select 1 from assignments a where a.child_item_id = ${inventoryItems.id} and a.unassigned_at is null)`);
+      where.push(sql`exists (select 1 from assignments a where a.child_item_id = ${Q.itemId} and a.unassigned_at is null)`);
       break;
     case "unassigned":
-      where.push(sql`not exists (select 1 from assignments a where a.child_item_id = ${inventoryItems.id} and a.unassigned_at is null)`);
+      where.push(sql`not exists (select 1 from assignments a where a.child_item_id = ${Q.itemId} and a.unassigned_at is null)`);
       break;
     case "insufficient_stock":
-      where.push(sql`${inventoryItems.kind} = 'consumable' and exists (select 1 from consumable_stock cs where cs.inventory_item_id = ${inventoryItems.id}
+      where.push(sql`${inventoryItems.kind} = 'consumable' and exists (select 1 from consumable_stock cs where cs.inventory_item_id = ${Q.itemId}
         and (cs.total_quantity - cs.allocated_quantity - cs.issued_quantity) <= coalesce(${inventoryItems.reorderThreshold}, 0))`);
       break;
   }
@@ -165,7 +166,7 @@ export async function listInventory(tx: Tx, orgId: string, f: InventoryFilters) 
       updatedAt: inventoryItems.updatedAt,
       ...av,
       tags: sql<string[]>`coalesce((select array_agg(t.name order by t.name) from inventory_item_tags it
-        join inventory_tags t on t.id = it.tag_id where it.item_id = ${inventoryItems.id}), '{}')`,
+        join inventory_tags t on t.id = it.tag_id where it.item_id = ${Q.itemId}), '{}')`,
     })
     .from(inventoryItems)
     .leftJoin(locations, eq(locations.id, inventoryItems.locationId))

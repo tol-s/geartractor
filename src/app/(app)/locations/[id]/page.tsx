@@ -36,7 +36,7 @@ export default async function LocationPage(props: PageProps<"/locations/[id]">) 
           { label: "Needs Inspection", v: stats?.needsInspection ?? 0, c: "text-[#b45309]" },
           { label: "Missing", v: stats?.missing ?? 0, c: "text-missing" },
         ].map((x) => (
-          <div key={x.label} className="rounded-[var(--radius-card)] border border-line bg-surface p-4 shadow-[var(--shadow-card)]">
+          <div key={x.label} className="rounded-[var(--radius-card)] border border-line bg-surface p-4">
             <p className="text-[12px] font-semibold uppercase tracking-wide text-muted">{x.label}</p>
             <p className={`mt-1 text-[28px] font-bold tabular ${x.c}`}>{x.v}</p>
           </div>

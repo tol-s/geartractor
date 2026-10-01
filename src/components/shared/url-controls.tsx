@@ -51,7 +51,7 @@ export function SearchInput({ placeholder = "Search", param = "q", className }: 
         onChange={(e) => setValue(e.target.value)}
         placeholder={placeholder}
         aria-label={placeholder}
-        className="h-11 w-full rounded-xl border border-line-2 bg-surface pl-10 pr-10 text-[15px] shadow-[0_1px_2px_rgb(11_11_15/0.03)] placeholder:text-muted/70 focus-visible:border-brand focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/15 md:text-[14px] [&::-webkit-search-cancel-button]:hidden"
+        className="h-11 w-full rounded-xl border border-line-2 bg-surface pl-10 pr-10 text-[15px] placeholder:text-muted/70 focus-visible:border-brand focus-visible:outline-none focus-visible:ring-4 focus-visible:ring-brand/15 md:text-[14px] [&::-webkit-search-cancel-button]:hidden"
       />
       {pending ? (
         <Loader2 className="absolute right-3.5 top-1/2 size-4 -translate-y-1/2 animate-spin text-muted" aria-label="Searching" />

@@ -123,7 +123,7 @@ function EquipmentIllustration() {
 
 export function AuthCard({ title, subtitle, children }: { title: string; subtitle?: React.ReactNode; children: React.ReactNode }) {
   return (
-    <div className="rounded-[28px] border border-line bg-surface p-6 shadow-[var(--shadow-lift)] sm:p-8">
+    <div className="rounded-[28px] border border-line bg-surface p-6 sm:p-8">
       <h1 className="text-[24px] font-bold tracking-[-0.02em] text-ink">{title}</h1>
       {subtitle && <p className="mt-1.5 text-[14px] text-muted">{subtitle}</p>}
       <div className="mt-6">{children}</div>

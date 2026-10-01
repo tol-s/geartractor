@@ -61,8 +61,15 @@ export const KIND_ICON: Record<InventoryKind, LucideIcon> = {
 const KIND_STYLE: Record<InventoryKind, string> = {
   component: "bg-[#0ea5e9]/12 text-[#0369a1]",
   configuration: "bg-[#8b5cf6]/12 text-[#6d28d9]",
-  kit: "bg-brand/12 text-brand",
-  consumable: "bg-consumable/14 text-[#c2410c]",
+  kit: "bg-brand text-white",
+  consumable: "bg-consumable text-white",
+};
+
+const KIND_SOLID: Record<InventoryKind, string> = {
+  component: "bg-[#0284c7] text-white",
+  configuration: "bg-[#7c3aed] text-white",
+  kit: "bg-brand text-white",
+  consumable: "bg-consumable text-white",
 };
 
 export function KindBadge({ kind }: { kind: InventoryKind }) {
@@ -79,7 +86,7 @@ export function KindIcon({ kind, size = 40 }: { kind: InventoryKind; size?: numb
   const Icon = KIND_ICON[kind];
   return (
     <span
-      className={`inline-flex shrink-0 items-center justify-center rounded-2xl ${KIND_STYLE[kind]}`}
+      className={`inline-flex shrink-0 items-center justify-center rounded-xl ${KIND_SOLID[kind]}`}
       style={{ width: size, height: size }}
       aria-hidden
     >

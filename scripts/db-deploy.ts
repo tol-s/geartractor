@@ -15,4 +15,8 @@ if (!process.env.DATABASE_URL_OWNER) {
 }
 run("tsx scripts/db-migrate.ts");
 if (process.env.APP_DB_PASSWORD) run("tsx scripts/db-roles.ts");
-if (process.env.SEED_DEMO_PASSWORD && process.env.SEED_ON_DEPLOY !== "false") run("tsx scripts/seed.ts");
+if (process.env.SEED_DEMO_PASSWORD && process.env.SEED_ON_DEPLOY !== "false") {
+  run("tsx scripts/seed.ts");
+  // Additive, runs once: rich demo data for every page and role.
+  run("tsx scripts/seed-bulk.ts");
+}

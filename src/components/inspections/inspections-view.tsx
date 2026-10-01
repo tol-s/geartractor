@@ -77,7 +77,7 @@ export function InspectionsView({ attention, history, canInspect, tab }: { atten
               {attention.map((a) => {
                 const due = a.nextInspectionDate && a.status === "available";
                 return (
-                  <li key={a.id} className={cn("flex items-center gap-3 rounded-[var(--radius-card)] border bg-surface p-3 shadow-[var(--shadow-card)] md:p-4", selected.has(a.id) ? "border-brand" : "border-line")}>
+                  <li key={a.id} className={cn("flex items-center gap-3 rounded-[var(--radius-card)] border bg-surface p-3 md:p-4", selected.has(a.id) ? "border-brand" : "border-line")}>
                     {canInspect && <Checkbox checked={selected.has(a.id)} onCheckedChange={() => toggle(a.id)} aria-label={`Select ${a.code}`} />}
                     <KindIcon kind={a.kind} size={40} />
                     <Link href={`/inventory/${a.id}`} className="min-w-0 flex-1">
@@ -124,7 +124,7 @@ export function InspectionsView({ attention, history, canInspect, tab }: { atten
           <Card className="divide-y divide-line">
             {history.rows.map((r) => (
               <Link key={r.id} href={`/inspections/${r.id}`} className="flex items-center gap-3 p-4 hover:bg-surface-2">
-                <span className="flex size-11 items-center justify-center rounded-2xl bg-available/10 text-available">
+                <span className="flex size-11 items-center justify-center rounded-2xl bg-available text-white">
                   <ClipboardCheck className="size-5" />
                 </span>
                 <span className="min-w-0 flex-1">

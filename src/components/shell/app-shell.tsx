@@ -176,6 +176,16 @@ export function AppShell({ user, org, isSuperAdmin, allowed, children }: ShellPr
         {/* Desktop top bar */}
         <header className="sticky top-0 z-30 hidden h-[72px] items-center justify-between border-b border-line/70 bg-canvas/85 px-8 backdrop-blur-xl lg:flex">
           <div className="flex items-center gap-3">
+            <span className="flex items-center gap-2 rounded-xl border border-line bg-surface py-1 pl-1 pr-3 text-[13px] font-semibold">
+              {org.logo ? (
+                // eslint-disable-next-line @next/next/no-img-element
+                <img src={org.logo} alt="" className="size-6 rounded-md bg-white object-contain" />
+              ) : (
+                <span className="grid size-6 place-items-center rounded-md bg-brand text-[11px] font-bold text-white">{org.name.slice(0, 1).toUpperCase()}</span>
+              )}
+              <span className="max-w-[220px] truncate">{org.name}</span>
+            </span>
+            <span className="text-muted" aria-hidden>/</span>
             <h2 className="text-[17px] font-semibold tracking-tight">{title}</h2>
             {isSuperAdmin && (
               <span className="rounded-full bg-ink px-2.5 py-1 text-[11px] font-semibold text-white">Platform admin · {org.name}</span>
@@ -336,7 +346,7 @@ function BottomNav({ pathname }: { pathname: string }) {
                 <Link
                   href="/scan"
                   aria-label="Scan QR code"
-                  className="-mt-7 flex size-[62px] items-center justify-center rounded-[22px] bg-brand text-white shadow-[0_10px_24px_-6px_var(--brand)] ring-[5px] ring-canvas transition-transform active:scale-95"
+                  className="-mt-7 flex size-[62px] items-center justify-center rounded-[22px] bg-brand text-white ring-[5px] ring-canvas transition-transform active:scale-95"
                 >
                   <ScanLine className="size-7" strokeWidth={2.2} />
                 </Link>

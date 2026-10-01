@@ -62,7 +62,7 @@ export function ForgotPasswordForm() {
   if (state?.done) {
     return (
       <div className="flex flex-col items-center py-2 text-center">
-        <span className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-available/12 text-available">
+        <span className="mb-4 flex size-14 items-center justify-center rounded-2xl bg-available text-white">
           <MailCheck className="size-7" />
         </span>
         <p className="text-[15px] font-semibold">Check your inbox</p>

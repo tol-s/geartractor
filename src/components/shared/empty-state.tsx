@@ -19,10 +19,10 @@ export function EmptyState({
   className?: string;
 }) {
   const toneClass = {
-    brand: "bg-brand/10 text-brand",
-    reserve: "bg-reserve/10 text-reserve",
-    checkin: "bg-checkin/10 text-checkin",
-    green: "bg-available/10 text-available",
+    brand: "bg-brand text-white",
+    reserve: "bg-reserve text-white",
+    checkin: "bg-checkin text-white",
+    green: "bg-available text-white",
   }[tone];
   return (
     <div

@@ -1,4 +1,5 @@
 import { and, asc, desc, eq, inArray, isNull, ne, or, sql, type SQL } from "drizzle-orm";
+import { Q } from "@/db/columns";
 import type { Tx } from "@/db/tenant";
 import {
   checkoutItems,
@@ -991,8 +992,8 @@ export async function listCheckouts(
       completedAt: checkouts.completedAt,
       locationName: locations.name,
       userName: users.name,
-      itemsOut: sql<number>`(select count(*)::int from checkout_items ci where ci.checkout_id = ${checkouts.id} and ci.status = 'issued' and ci.parent_checkout_item_id is null)`,
-      itemsTotal: sql<number>`(select count(*)::int from checkout_items ci where ci.checkout_id = ${checkouts.id} and ci.parent_checkout_item_id is null)`,
+      itemsOut: sql<number>`(select count(*)::int from checkout_items ci where ci.checkout_id = ${Q.checkoutId} and ci.status = 'issued' and ci.parent_checkout_item_id is null)`,
+      itemsTotal: sql<number>`(select count(*)::int from checkout_items ci where ci.checkout_id = ${Q.checkoutId} and ci.parent_checkout_item_id is null)`,
     })
     .from(checkouts)
     .leftJoin(locations, eq(locations.id, checkouts.locationId))
@@ -1016,7 +1017,7 @@ export async function searchCheckoutCandidates(
   const where: SQL[] = [eq(inventoryItems.organizationId, ctx.orgId), isNull(inventoryItems.archivedAt)];
   if (f.kind && f.kind !== "all") where.push(eq(inventoryItems.kind, f.kind));
   if (like) where.push(sql`(${inventoryItems.code} ilike ${like} or ${inventoryItems.name} ilike ${like} or ${inventoryItems.techSpec} ilike ${like})`);
-  where.push(sql`not exists (select 1 from assignments a where a.child_item_id = ${inventoryItems.id} and a.unassigned_at is null)`);
+  where.push(sql`not exists (select 1 from assignments a where a.child_item_id = ${Q.itemId} and a.unassigned_at is null)`);
   const rows = await tx
     .select({
       id: inventoryItems.id,
@@ -1028,7 +1029,7 @@ export async function searchCheckoutCandidates(
       locationId: inventoryItems.locationId,
       locationName: locations.name,
       techSpec: inventoryItems.techSpec,
-      children: sql<number>`(select count(*)::int from assignments a where a.parent_item_id = ${inventoryItems.id} and a.unassigned_at is null)`,
+      children: sql<number>`(select count(*)::int from assignments a where a.parent_item_id = ${Q.itemId} and a.unassigned_at is null)`,
     })
     .from(inventoryItems)
     .leftJoin(locations, eq(locations.id, inventoryItems.locationId))

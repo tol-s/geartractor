@@ -1,4 +1,5 @@
 import { and, asc, desc, eq, inArray, isNull, sql } from "drizzle-orm";
+import { Q } from "@/db/columns";
 import type { Tx } from "@/db/tenant";
 import { inspectionRecords, inspections, inventoryItems, locations, users } from "@/db/schema";
 import { STATUS_LABEL, type InspectionOutcome, type ItemStatus } from "@/lib/domain";
@@ -217,7 +218,7 @@ export async function listInspections(tx: Tx, orgId: string, page = 1) {
           'fail', count(*) filter (where outcome = 'fail'),
           'missing', count(*) filter (where outcome = 'missing'),
           'exception', count(*) filter (where outcome = 'exception'))
-        from inspection_records ir where ir.inspection_id = ${inspections.id})`,
+        from inspection_records ir where ir.inspection_id = ${Q.inspectionId})`,
     })
     .from(inspections)
     .leftJoin(users, eq(users.id, inspections.inspectorId))
@@ -293,7 +294,7 @@ export async function listAttentionItems(tx: Tx, orgId: string) {
       nextInspectionDate: inventoryItems.nextInspectionDate,
       computedExpiry: inventoryItems.computedExpiry,
       locationName: locations.name,
-      assigned: sql<boolean>`exists (select 1 from assignments a where a.child_item_id = ${inventoryItems.id} and a.unassigned_at is null)`,
+      assigned: sql<boolean>`exists (select 1 from assignments a where a.child_item_id = ${Q.itemId} and a.unassigned_at is null)`,
     })
     .from(inventoryItems)
     .leftJoin(locations, eq(locations.id, inventoryItems.locationId))

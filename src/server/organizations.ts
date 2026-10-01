@@ -1,4 +1,5 @@
 import { asc, eq, sql } from "drizzle-orm";
+import { Q } from "@/db/columns";
 import { z } from "zod";
 import type { Tx } from "@/db/tenant";
 import { invitations, locations, organizations, users, type OrgSettings } from "@/db/schema";
@@ -70,9 +71,9 @@ export async function listOrganizations(tx: Tx) {
       primaryColor: organizations.primaryColor,
       logoDataUrl: organizations.logoDataUrl,
       createdAt: organizations.createdAt,
-      userCount: sql<number>`(select count(*)::int from users u where u.organization_id = ${organizations.id})`,
-      inventoryCount: sql<number>`(select count(*)::int from inventory_items i where i.organization_id = ${organizations.id} and i.archived_at is null)`,
-      activeCheckouts: sql<number>`(select count(*)::int from checkouts c where c.organization_id = ${organizations.id} and c.status in ('active','partially_returned'))`,
+      userCount: sql<number>`(select count(*)::int from users u where u.organization_id = ${Q.organizationId})`,
+      inventoryCount: sql<number>`(select count(*)::int from inventory_items i where i.organization_id = ${Q.organizationId} and i.archived_at is null)`,
+      activeCheckouts: sql<number>`(select count(*)::int from checkouts c where c.organization_id = ${Q.organizationId} and c.status in ('active','partially_returned'))`,
     })
     .from(organizations)
     .orderBy(asc(organizations.name));

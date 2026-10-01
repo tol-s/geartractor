@@ -60,7 +60,7 @@ export function Segmented<T extends string>({
           className={cn(
             "flex-1 rounded-lg px-3 font-semibold transition-all",
             size === "sm" ? "h-8 text-[12.5px]" : "h-9 text-[13px]",
-            value === o.value ? "bg-surface text-ink shadow-sm" : "text-muted hover:text-ink",
+            value === o.value ? "bg-surface text-ink ring-1 ring-line-2" : "text-muted hover:text-ink",
           )}
         >
           {o.label}

@@ -4,7 +4,7 @@ import { PackageSearch } from "lucide-react";
 export default function NotFound() {
   return (
     <div className="flex min-h-[70dvh] flex-col items-center justify-center px-6 text-center">
-      <span className="mb-5 flex size-16 items-center justify-center rounded-3xl bg-brand/10 text-brand">
+      <span className="mb-5 flex size-16 items-center justify-center rounded-3xl bg-brand text-white">
         <PackageSearch className="size-8" />
       </span>
       <h1 className="text-[24px] font-bold tracking-tight">Not found</h1>

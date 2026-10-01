@@ -5,11 +5,11 @@ export const buttonVariants = cva(
   {
     variants: {
       variant: {
-        primary: "bg-ink text-white hover:bg-ink/90 shadow-[0_1px_0_rgb(255_255_255/0.08)_inset]",
-        brand: "bg-brand text-white hover:brightness-105 shadow-[0_6px_18px_-6px_var(--brand)]",
+        primary: "bg-ink text-white hover:bg-ink/90",
+        brand: "bg-brand text-white hover:brightness-105",
         reserve: "bg-reserve text-white hover:brightness-105",
         checkin: "bg-checkin text-white hover:brightness-105",
-        secondary: "bg-surface text-ink border border-line-2 hover:bg-surface-2 shadow-[0_1px_2px_rgb(11_11_15/0.04)]",
+        secondary: "bg-surface text-ink border border-line-2 hover:bg-surface-2",
         ghost: "text-ink-2 hover:bg-ink/5",
         danger: "bg-missing text-white hover:brightness-95",
         "danger-outline": "border border-missing/30 text-missing hover:bg-missing/5",
