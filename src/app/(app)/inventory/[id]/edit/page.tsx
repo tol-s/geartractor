@@ -6,7 +6,8 @@ import { configurations, kits } from "@/db/schema";
 import { listLocations } from "@/server/locations";
 import { getInventoryDetail, listTags } from "@/server/inventory";
 import { PageHeader } from "@/components/shared/page-header";
-import { InventoryForm, type InventoryFormValues } from "@/components/inventory/inventory-form";
+import { InventoryForm } from "@/components/inventory/inventory-form";
+import type { InventoryFormValues } from "@/lib/inventory-form-values";
 import { notFoundOnError } from "@/server/pages";
 
 export const metadata: Metadata = { title: "Edit" };

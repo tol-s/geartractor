@@ -14,7 +14,8 @@
     "db:migrate": "tsx scripts/db-migrate.ts",
     "db:roles": "tsx scripts/db-roles.ts",
     "db:seed": "tsx scripts/seed.ts",
-    "db:setup": "tsx scripts/db-migrate.ts && tsx scripts/db-roles.ts"
+    "db:setup": "tsx scripts/db-migrate.ts && tsx scripts/db-roles.ts",
+    "db:deploy": "tsx scripts/db-deploy.ts"
   },
   "dependencies": {
     "bcryptjs": "^3.0.3",

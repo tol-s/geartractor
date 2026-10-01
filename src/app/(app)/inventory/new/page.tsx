@@ -6,7 +6,8 @@ import { listTags } from "@/server/inventory";
 import { INVENTORY_KINDS, KIND_LABEL, type InventoryKind } from "@/lib/domain";
 import { PageHeader } from "@/components/shared/page-header";
 import { EmptyState } from "@/components/shared/empty-state";
-import { InventoryForm, emptyInventoryValues } from "@/components/inventory/inventory-form";
+import { InventoryForm } from "@/components/inventory/inventory-form";
+import { emptyInventoryValues } from "@/lib/inventory-form-values";
 import { MapPin } from "lucide-react";
 
 export const metadata: Metadata = { title: "Add Inventory" };

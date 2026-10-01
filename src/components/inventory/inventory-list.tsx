@@ -149,7 +149,7 @@ export async function InventoryList({
         <>
           {/* Desktop table */}
           <div className="hidden overflow-hidden rounded-[var(--radius-card)] border border-line bg-surface shadow-[var(--shadow-card)] md:block">
-            <div className="overflow-x-auto">
+            <div className="relative overflow-x-auto">
               <table className="w-full min-w-[1180px] border-collapse text-left text-[13.5px]">
                 <thead>
                   <tr className="border-b border-line bg-surface-2 text-[12px] font-semibold uppercase tracking-wide text-muted">

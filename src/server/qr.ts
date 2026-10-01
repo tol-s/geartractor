@@ -19,7 +19,10 @@ export async function ensureQrCode(tx: Tx, orgId: string, itemId: string) {
 }
 
 export function appUrl(): string {
-  return (process.env.APP_URL ?? "http://localhost:3000").replace(/\/$/, "");
+  const url =
+    process.env.APP_URL ||
+    (process.env.VERCEL_PROJECT_PRODUCTION_URL ? `https://${process.env.VERCEL_PROJECT_PRODUCTION_URL}` : "http://localhost:3000");
+  return url.replace(/\/$/, "");
 }
 
 export function qrUrlForToken(token: string) {

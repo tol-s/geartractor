@@ -180,7 +180,7 @@ export function OrgSettingsView({
         <h2 className="mb-3 text-[13px] font-bold uppercase tracking-[0.08em]">Organization Branding</h2>
         <BrandingForm initial={org} onSave={(v) => branding.run(v)} pending={branding.pending} error={branding.error} />
       </section>
-      <section>
+      <section id="inventory" className="scroll-mt-24">
         <h2 className="mb-3 text-[13px] font-bold uppercase tracking-[0.08em]">Inventory Settings</h2>
         <Card className="divide-y divide-line">
           {[

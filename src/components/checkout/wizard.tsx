@@ -752,7 +752,7 @@ function ReviewStep({
           <h3 className="text-[15px] font-bold">Checkout Basket</h3>
           <span className="text-[13px] text-muted">{plural(roots.length, "item")}</span>
         </div>
-        <div className="overflow-x-auto">
+        <div className="relative overflow-x-auto">
           <table className="w-full min-w-[620px] text-[13.5px]">
             <thead>
               <tr className="border-b border-line text-left text-[12px] uppercase tracking-wide text-muted">

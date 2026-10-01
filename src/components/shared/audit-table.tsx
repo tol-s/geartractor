@@ -22,7 +22,7 @@ export function AuditTable({ rows, showEntity }: { rows: AuditRow[]; showEntity?
   return (
     <>
       <Card className="hidden overflow-hidden md:block">
-        <div className="overflow-x-auto">
+        <div className="relative overflow-x-auto">
           <table className="w-full min-w-[820px] text-[13.5px]">
             <thead>
               <tr className="border-b border-line bg-surface-2 text-left text-[12px] uppercase tracking-wide text-muted">

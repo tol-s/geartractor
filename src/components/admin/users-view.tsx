@@ -39,7 +39,7 @@ export function UsersView({ users, selfId, orgName }: { users: U[]; selfId: stri
           </Button>
         }
       />
-      <Card className="hidden overflow-hidden md:block">
+      <Card className="relative hidden overflow-hidden md:block">
         <table className="w-full text-[14px]">
           <thead>
             <tr className="border-b border-line bg-surface-2 text-left text-[12px] uppercase tracking-wide text-muted">

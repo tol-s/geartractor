@@ -17,9 +17,12 @@ const GENERIC_LOGIN_ERROR = new AppError(
 
 export async function authenticate(emailRaw: string, password: string, ip: string) {
   const email = emailRaw.trim().toLowerCase();
-  return withSystem(async (tx) => {
+  // Counted in its own committed transaction so failed attempts are never rolled back.
+  await withSystem(async (tx) => {
     await enforceRateLimit(tx, `login:ip:${ip}`, 30, 15 * 60);
     await enforceRateLimit(tx, `login:email:${email}`, 10, 15 * 60);
+  });
+  return withSystem(async (tx) => {
     const [row] = await tx
       .select({
         id: users.id,
@@ -52,9 +55,11 @@ export async function authenticate(emailRaw: string, password: string, ip: strin
 
 export async function requestPasswordReset(emailRaw: string, ip: string) {
   const email = emailRaw.trim().toLowerCase();
-  const result = await withSystem(async (tx) => {
+  await withSystem(async (tx) => {
     await enforceRateLimit(tx, `reset:ip:${ip}`, 10, 15 * 60);
     await enforceRateLimit(tx, `reset:email:${email}`, 3, 15 * 60);
+  });
+  const result = await withSystem(async (tx) => {
     const [user] = await tx
       .select({ id: users.id, name: users.name, status: users.status })
       .from(users)
@@ -188,8 +193,8 @@ export async function changePassword(userId: string, current: string, next: stri
   const weak = validatePasswordStrength(next);
   if (weak) throw new AppError("Choose a stronger password", weak, "validation");
   const hash = await hashPassword(next);
+  await withSystem((tx) => enforceRateLimit(tx, `pwchange:${userId}`, 5, 15 * 60));
   await withSystem(async (tx) => {
-    await enforceRateLimit(tx, `pwchange:${userId}`, 5, 15 * 60);
     const [user] = await tx.select().from(users).where(eq(users.id, userId));
     if (!user || !(await verifyPassword(current, user.passwordHash))) {
       throw new AppError("Incorrect password", "Your current password is incorrect.", "invalid_credentials");
