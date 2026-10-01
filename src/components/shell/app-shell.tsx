@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import {
   Activity,
@@ -10,6 +10,7 @@ import {
   Building2,
   CalendarClock,
   ChartColumn,
+  ChevronLeft,
   ClipboardCheck,
   Droplets,
   House,
@@ -109,6 +110,10 @@ function isActive(pathname: string, item: NavItem) {
 
 export function AppShell({ user, org, orgs, isSuperAdmin, allowed, children }: ShellProps) {
   const pathname = usePathname();
+  React.useEffect(() => {
+    if (lastPath !== null && lastPath !== pathname) inAppNavigations += 1;
+    lastPath = pathname;
+  }, [pathname]);
   const [collapsed, setCollapsed] = React.useState(false);
   React.useEffect(() => {
     try {
@@ -206,7 +211,11 @@ export function AppShell({ user, org, orgs, isSuperAdmin, allowed, children }: S
         {/* Mobile top bar */}
         {!hideChrome && (
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-line/60 bg-canvas/85 px-4 backdrop-blur-xl lg:hidden">
-            <OrgSwitcher {...switcher} variant="mobile" />
+            {isMobileRoot(pathname) ? (
+              <OrgSwitcher {...switcher} variant="mobile" />
+            ) : (
+              <MobileBack pathname={pathname} title={title} />
+            )}
             <ProfileMenu user={user} org={org} isSuperAdmin={isSuperAdmin} compact />
           </header>
         )}
@@ -222,6 +231,43 @@ export function AppShell({ user, org, orgs, isSuperAdmin, allowed, children }: S
       </div>
 
       {!hideChrome && <BottomNav pathname={pathname} />}
+    </div>
+  );
+}
+
+/** Top-level mobile screens (bottom nav tabs) show the organization switcher; everything else gets a back button. */
+const MOBILE_ROOTS = ["/dashboard", "/inventory", "/activity", "/profile", "/scan", "/admin/organizations"];
+const isMobileRoot = (pathname: string) => MOBILE_ROOTS.includes(pathname);
+
+/** Where "back" goes when the page was opened directly (no in-app history), e.g. from a QR code or a link. */
+function fallbackFor(pathname: string) {
+  const parts = pathname.split("/").filter(Boolean);
+  const parent = `/${parts.slice(0, -1).join("/")}`;
+  if (parts.length > 1 && parent !== "/q") return parent;
+  return BOTTOM.find((b) => b.match.some((m) => pathname === m || pathname.startsWith(`${m}/`)))?.href ?? "/dashboard";
+}
+
+// Counts client-side route changes in this tab, so "back" only uses history that belongs to the app.
+let inAppNavigations = 0;
+let lastPath: string | null = null;
+
+function MobileBack({ pathname, title }: { pathname: string; title: string }) {
+  const router = useRouter();
+  const goBack = () => {
+    if (inAppNavigations > 0) router.back();
+    else router.push(fallbackFor(pathname));
+  };
+  return (
+    <div className="flex min-w-0 items-center gap-2">
+      <button
+        type="button"
+        onClick={goBack}
+        className="grid size-10 shrink-0 place-items-center rounded-xl border border-line bg-surface text-ink transition-colors hover:bg-surface-2 active:scale-95"
+        aria-label="Go back"
+      >
+        <ChevronLeft className="size-5" strokeWidth={2.4} aria-hidden />
+      </button>
+      <span className="truncate text-[16px] font-bold tracking-[-0.01em] text-ink">{title}</span>
     </div>
   );
 }
