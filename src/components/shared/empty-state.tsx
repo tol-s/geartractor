@@ -1,9 +1,6 @@
-"use client";
-
 import Link from "next/link";
-import { motion } from "framer-motion";
 import type { LucideIcon } from "lucide-react";
-import { buttonVariants } from "../ui/button";
+import { buttonVariants } from "../ui/button-variants";
 import { cn } from "@/lib/utils";
 
 export function EmptyState({
@@ -28,11 +25,9 @@ export function EmptyState({
     green: "bg-available/10 text-available",
   }[tone];
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 8 }}
-      animate={{ opacity: 1, y: 0 }}
+    <div
       className={cn(
-        "flex flex-col items-center justify-center rounded-[var(--radius-card)] border border-dashed border-line-2 bg-surface/60 px-6 py-12 text-center",
+        "animate-in fade-in slide-in-from-bottom-2 duration-300 flex flex-col items-center justify-center rounded-[var(--radius-card)] border border-dashed border-line-2 bg-surface/60 px-6 py-12 text-center",
         className,
       )}
     >
@@ -46,6 +41,6 @@ export function EmptyState({
           {action.label}
         </Link>
       )}
-    </motion.div>
+    </div>
   );
 }

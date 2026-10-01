@@ -13,7 +13,6 @@ import {
   LIFESPAN_MODES,
   QUANTITY_UNITS,
   STATUS_LABEL,
-  type InventoryKind,
   type ItemStatus,
 } from "@/lib/domain";
 import type { InventoryInput } from "@/lib/validators";

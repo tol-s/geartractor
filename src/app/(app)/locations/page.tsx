@@ -23,7 +23,7 @@ export default async function LocationsPage() {
       {locations.length === 0 ? (
         <EmptyState icon={MapPin} title="No locations yet." description="Add a storage location to start adding inventory." />
       ) : (
-        <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
           {locations.map((l) => {
             const s = stats.get(l.id);
             return (

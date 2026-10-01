@@ -50,7 +50,7 @@ export default async function ReservationsPage(props: PageProps<"/reservations">
       {res.rows.length === 0 ? (
         <EmptyState icon={CalendarClock} title="No reservations." action={{ label: "Reserve Gear", href: "/reservations/new" }} tone="reserve" />
       ) : (
-        <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
           {res.rows.map((r) => {
             const d = new Date(r.startsAt);
             return (

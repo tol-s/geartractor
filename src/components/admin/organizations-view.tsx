@@ -71,7 +71,7 @@ export function OrganizationsView({
           </Card>
         ))}
       </div>
-      <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+      <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
         {orgs.map((o) => (
           <li key={o.id}>
             <Card className="flex h-full flex-col p-5">

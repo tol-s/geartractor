@@ -146,7 +146,7 @@ export function DashboardView({
         {data.activeSessions.length === 0 ? (
           <EmptyState icon={PackageSearch} title="No active checkout sessions." action={{ label: "Start Checkout", href: "/checkouts/new" }} />
         ) : (
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {data.activeSessions.map((s, i) => {
               const overdue = s.dueAt ? new Date(s.dueAt) < new Date() : false;
               return (
@@ -202,7 +202,7 @@ export function DashboardView({
               </Link>
             }
           />
-          <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+          <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-3">
             {data.upcoming.map((r) => (
               <Link
                 key={r.id}
@@ -354,7 +354,7 @@ function Alerts({ alerts }: { alerts: DashboardData["alerts"] }) {
   return (
     <motion.section variants={item} className="space-y-4" aria-label="Alerts">
       <SectionTitle title="Needs Attention" subtitle="Actionable alerts" />
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         {list.map((a) => (
           <Link key={a.key} href={a.href} className="group">
             <motion.div

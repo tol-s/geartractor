@@ -54,7 +54,7 @@ export default async function CheckoutsPage(props: PageProps<"/checkouts">) {
       {res.rows.length === 0 ? (
         <EmptyState icon={PackageSearch} title={status === "active" ? "No active checkout sessions." : "No checkouts found"} action={{ label: "Start Checkout", href: "/checkouts/new" }} />
       ) : (
-        <ul className="grid gap-3 md:grid-cols-2 xl:grid-cols-3">
+        <ul className="grid grid-cols-1 gap-3 md:grid-cols-2 xl:grid-cols-3">
           {res.rows.map((r) => {
             const overdue = Boolean(r.dueAt && r.dueAt < new Date() && (r.status === "active" || r.status === "partially_returned"));
             const href = r.status === "draft" ? `/checkouts/${r.id}/edit` : `/checkouts/${r.id}`;
