@@ -19,4 +19,5 @@ if (process.env.SEED_DEMO_PASSWORD && process.env.SEED_ON_DEPLOY !== "false") {
   run("tsx scripts/seed.ts");
   // Additive, runs once: rich demo data for every page and role.
   run("tsx scripts/seed-bulk.ts");
+  run("tsx scripts/seed-memberships.ts");
 }

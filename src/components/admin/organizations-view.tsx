@@ -37,6 +37,11 @@ export function OrganizationsView({
   stats: { totalOrganizations: number; activeOrganizations: number; totalUsers: number; totalInventory: number };
 }) {
   const [open, setOpen] = React.useState(false);
+  React.useEffect(() => {
+    // "Create organization" in the organization switcher links here with ?new=1.
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    if (new URLSearchParams(window.location.search).get("new") === "1") setOpen(true);
+  }, []);
   const [admin, setAdmin] = React.useState({ name: "", email: "" });
   const [invite, setInvite] = React.useState<string | null>(null);
   const create = useAction(createOrganizationAction, {

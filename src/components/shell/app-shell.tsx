@@ -3,7 +3,7 @@
 import * as React from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import {
   Activity,
   Boxes,
@@ -32,12 +32,14 @@ import { cn } from "@/lib/utils";
 import { ROLE_LABEL, type Role } from "@/lib/domain";
 import { Avatar } from "../ui/avatar";
 import { Menu, MenuContent, MenuItem, MenuLabel, MenuSeparator, MenuTrigger } from "../ui/menu";
-import { LogoMark, Wordmark } from "./logo";
+import { OrgSwitcher, type SwitcherOrg } from "./org-switcher";
+import { PLATFORM_ORG_ID } from "./platform";
 import { leaveOrganizationAction, signOutAction } from "@/app/actions/session";
 
 export type ShellProps = {
   user: { name: string; email: string; role: Role };
-  org: { name: string; logo: string | null };
+  org: { id: string; name: string; logo: string | null };
+  orgs: SwitcherOrg[];
   isSuperAdmin: boolean;
   allowed: string[];
   children: React.ReactNode;
@@ -45,19 +47,34 @@ export type ShellProps = {
 
 type NavItem = { href: string; label: string; icon: LucideIcon; match?: string[] };
 
-const MAIN_NAV: NavItem[] = [
-  { href: "/dashboard", label: "Overview", icon: LayoutDashboard },
-  { href: "/inventory", label: "Inventory", icon: Package, match: ["/inventory", "/print"] },
-  { href: "/configurations", label: "Configurations", icon: Layers },
-  { href: "/kits", label: "Kits", icon: Boxes },
-  { href: "/consumables", label: "Consumables", icon: Droplets },
-  { href: "/checkouts", label: "Checkouts", icon: PackageCheck, match: ["/checkouts", "/check-in"] },
-  { href: "/reservations", label: "Reservations", icon: CalendarClock },
-  { href: "/inspections", label: "Inspections", icon: ClipboardCheck },
-  { href: "/locations", label: "Locations", icon: MapPin },
-  { href: "/users", label: "Users", icon: UsersRound },
-  { href: "/reports", label: "Reports", icon: ChartColumn },
-  { href: "/settings", label: "Settings", icon: Settings },
+const NAV_SECTIONS: { label: string | null; items: NavItem[] }[] = [
+  { label: null, items: [{ href: "/dashboard", label: "Overview", icon: LayoutDashboard }] },
+  {
+    label: "Equipment",
+    items: [
+      { href: "/inventory", label: "Inventory", icon: Package, match: ["/inventory", "/print"] },
+      { href: "/configurations", label: "Configurations", icon: Layers },
+      { href: "/kits", label: "Kits", icon: Boxes },
+      { href: "/consumables", label: "Consumables", icon: Droplets },
+    ],
+  },
+  {
+    label: "Operations",
+    items: [
+      { href: "/checkouts", label: "Checkouts", icon: PackageCheck, match: ["/checkouts", "/check-in"] },
+      { href: "/reservations", label: "Reservations", icon: CalendarClock },
+      { href: "/inspections", label: "Inspections", icon: ClipboardCheck },
+    ],
+  },
+  {
+    label: "Organization",
+    items: [
+      { href: "/locations", label: "Locations", icon: MapPin },
+      { href: "/users", label: "Users", icon: UsersRound },
+      { href: "/reports", label: "Reports", icon: ChartColumn },
+      { href: "/settings", label: "Settings", icon: Settings },
+    ],
+  },
 ];
 
 const ADMIN_NAV: NavItem[] = [
@@ -90,7 +107,7 @@ function isActive(pathname: string, item: NavItem) {
   return prefixes.some((p) => pathname === p || pathname.startsWith(`${p}/`));
 }
 
-export function AppShell({ user, org, isSuperAdmin, allowed, children }: ShellProps) {
+export function AppShell({ user, org, orgs, isSuperAdmin, allowed, children }: ShellProps) {
   const pathname = usePathname();
   const [collapsed, setCollapsed] = React.useState(false);
   React.useEffect(() => {
@@ -108,7 +125,10 @@ export function AppShell({ user, org, isSuperAdmin, allowed, children }: ShellPr
       return !c;
     });
   };
-  const nav = MAIN_NAV.filter((n) => allowed.includes(n.href));
+  const sections = NAV_SECTIONS.map((sec) => ({ ...sec, items: sec.items.filter((n) => allowed.includes(n.href)) })).filter(
+    (sec) => sec.items.length > 0,
+  );
+  const switcher = { orgs, currentId: org.id, role: user.role, isSuperAdmin, canSettings: allowed.includes("/settings") };
   const title = TITLES.find(([p]) => pathname === p || pathname.startsWith(`${p}/`))?.[1] ?? "Gear Tractor";
   const hideChrome = pathname.startsWith("/scan");
 
@@ -116,51 +136,50 @@ export function AppShell({ user, org, isSuperAdmin, allowed, children }: ShellPr
     <div className="min-h-dvh">
       {/* Desktop sidebar */}
       <motion.aside
-        animate={{ width: collapsed ? 84 : 268 }}
+        animate={{ width: collapsed ? 80 : 272 }}
         transition={{ type: "spring", stiffness: 380, damping: 38 }}
-        className="fixed inset-y-0 left-0 z-40 hidden flex-col bg-sidebar text-white lg:flex"
+        className="fixed inset-y-0 left-0 z-40 hidden flex-col border-r border-line bg-surface lg:flex"
         aria-label="Primary"
       >
-        <div className={cn("flex h-[72px] items-center px-5", collapsed && "justify-center px-0")}>
-          <Link href="/dashboard" className="flex min-w-0 items-center gap-2.5" aria-label="Gear Tractor home">
-            {org.logo ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img src={org.logo} alt="" className="size-9 shrink-0 rounded-xl bg-white object-contain p-0.5" />
-            ) : (
-              <LogoMark />
-            )}
-            {!collapsed && (
-              <span className="min-w-0">
-                <span className="block truncate text-[16px] font-bold tracking-[-0.02em]">Gear Tractor</span>
-                <span className="block truncate text-[12px] font-medium text-white/50">{org.name}</span>
-              </span>
-            )}
-          </Link>
+        <div className={cn("p-3 pt-4", collapsed && "flex justify-center px-0")}>
+          <OrgSwitcher {...switcher} variant={collapsed ? "collapsed" : "sidebar"} />
         </div>
-        <nav className="no-scrollbar flex-1 overflow-y-auto px-3 pb-4">
-          <ul className="space-y-0.5">
-            {nav.map((item) => (
-              <SideLink key={item.href} item={item} active={isActive(pathname, item)} collapsed={collapsed} />
-            ))}
-          </ul>
+        <nav className="no-scrollbar flex-1 overflow-y-auto px-3 pb-4 pt-1">
+          {sections.map((sec, i) => (
+            <div key={sec.label ?? i} className={cn(i > 0 && "mt-5")}>
+              {sec.label &&
+                (collapsed ? (
+                  <div className="mx-auto mb-2 h-px w-8 bg-line" aria-hidden />
+                ) : (
+                  <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">{sec.label}</p>
+                ))}
+              <ul className="space-y-0.5">
+                {sec.items.map((item) => (
+                  <SideLink key={item.href} item={item} active={isActive(pathname, item)} collapsed={collapsed} />
+                ))}
+              </ul>
+            </div>
+          ))}
           {isSuperAdmin && (
-            <>
-              <p className={cn("mb-1.5 mt-6 px-3 text-[11px] font-semibold uppercase tracking-[0.1em] text-white/35", collapsed && "sr-only")}>
-                Platform
-              </p>
+            <div className="mt-5">
+              {collapsed ? (
+                <div className="mx-auto mb-2 h-px w-8 bg-line" aria-hidden />
+              ) : (
+                <p className="mb-1.5 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-muted">Platform</p>
+              )}
               <ul className="space-y-0.5">
                 {ADMIN_NAV.map((item) => (
                   <SideLink key={item.href} item={item} active={isActive(pathname, item)} collapsed={collapsed} />
                 ))}
               </ul>
-            </>
+            </div>
           )}
         </nav>
-        <div className="border-t border-white/10 p-3">
+        <div className="border-t border-line p-3">
           <button
             onClick={toggle}
             className={cn(
-              "flex h-10 w-full items-center gap-3 rounded-xl px-3 text-[13px] font-medium text-white/60 hover:bg-white/5 hover:text-white",
+              "flex h-10 w-full items-center gap-3 rounded-xl px-3 text-[13px] font-medium text-muted hover:bg-ink/5 hover:text-ink",
               collapsed && "justify-center px-0",
             )}
             aria-label={collapsed ? "Expand sidebar" : "Collapse sidebar"}
@@ -172,22 +191,12 @@ export function AppShell({ user, org, isSuperAdmin, allowed, children }: ShellPr
         </div>
       </motion.aside>
 
-      <div className={cn("transition-[padding] duration-300", collapsed ? "lg:pl-[84px]" : "lg:pl-[268px]")}>
+      <div className={cn("transition-[padding] duration-300", collapsed ? "lg:pl-[80px]" : "lg:pl-[272px]")}>
         {/* Desktop top bar */}
         <header className="sticky top-0 z-30 hidden h-[72px] items-center justify-between border-b border-line/70 bg-canvas/85 px-8 backdrop-blur-xl lg:flex">
           <div className="flex items-center gap-3">
-            <span className="flex items-center gap-2 rounded-xl border border-line bg-surface py-1 pl-1 pr-3 text-[13px] font-semibold">
-              {org.logo ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={org.logo} alt="" className="size-6 rounded-md bg-white object-contain" />
-              ) : (
-                <span className="grid size-6 place-items-center rounded-md bg-brand text-[11px] font-bold text-white">{org.name.slice(0, 1).toUpperCase()}</span>
-              )}
-              <span className="max-w-[220px] truncate">{org.name}</span>
-            </span>
-            <span className="text-muted" aria-hidden>/</span>
             <h2 className="text-[17px] font-semibold tracking-tight">{title}</h2>
-            {isSuperAdmin && (
+            {isSuperAdmin && org.id !== PLATFORM_ORG_ID && (
               <span className="rounded-full bg-ink px-2.5 py-1 text-[11px] font-semibold text-white">Platform admin · {org.name}</span>
             )}
           </div>
@@ -197,9 +206,7 @@ export function AppShell({ user, org, isSuperAdmin, allowed, children }: ShellPr
         {/* Mobile top bar */}
         {!hideChrome && (
           <header className="sticky top-0 z-30 flex h-16 items-center justify-between border-b border-line/60 bg-canvas/85 px-4 backdrop-blur-xl lg:hidden">
-            <Link href="/dashboard" aria-label="Home">
-              <Wordmark name={org.name} logo={org.logo} className="[&>span:last-child]:text-[16px]" />
-            </Link>
+            <OrgSwitcher {...switcher} variant="mobile" />
             <ProfileMenu user={user} org={org} isSuperAdmin={isSuperAdmin} compact />
           </header>
         )}
@@ -228,22 +235,13 @@ function SideLink({ item, active, collapsed }: { item: NavItem; active: boolean;
         title={collapsed ? item.label : undefined}
         aria-current={active ? "page" : undefined}
         className={cn(
-          "group relative flex h-11 items-center gap-3 rounded-xl px-3 text-[14px] font-medium transition-colors",
-          active ? "text-white" : "text-white/60 hover:bg-white/[0.06] hover:text-white",
+          "flex h-10 items-center gap-3 rounded-xl px-3 text-[14px] transition-colors",
+          active ? "bg-ink/[0.06] font-semibold text-ink" : "font-medium text-ink-2 hover:bg-ink/[0.04] hover:text-ink",
           collapsed && "justify-center px-0",
         )}
       >
-        {active && (
-          <motion.span
-            layoutId="side-active"
-            className="absolute inset-0 rounded-xl bg-white/[0.1]"
-            transition={{ type: "spring", stiffness: 500, damping: 40 }}
-          >
-            <span className="absolute left-0 top-1/2 h-5 w-1 -translate-y-1/2 rounded-r-full bg-brand" />
-          </motion.span>
-        )}
-        <Icon className={cn("relative size-[19px] shrink-0", active && "text-brand")} aria-hidden />
-        {!collapsed && <span className="relative truncate">{item.label}</span>}
+        <Icon className={cn("size-[19px] shrink-0", active ? "text-brand" : "text-muted")} strokeWidth={active ? 2.3 : 1.9} aria-hidden />
+        {!collapsed && <span className="truncate">{item.label}</span>}
       </Link>
     </li>
   );
@@ -363,18 +361,7 @@ function BottomNav({ pathname }: { pathname: string }) {
                   active ? "text-ink" : "text-muted",
                 )}
               >
-                <AnimatePresence>
-                  {active && (
-                    <motion.span
-                      layoutId="bottom-active"
-                      className="absolute top-1 h-1 w-6 rounded-full bg-brand"
-                      initial={{ opacity: 0 }}
-                      animate={{ opacity: 1 }}
-                      exit={{ opacity: 0 }}
-                    />
-                  )}
-                </AnimatePresence>
-                <Icon className="size-[22px]" strokeWidth={active ? 2.3 : 1.9} aria-hidden />
+                <Icon className={cn("size-[22px]", active && "text-brand")} strokeWidth={active ? 2.3 : 1.9} aria-hidden />
                 {item.label}
               </Link>
             </li>

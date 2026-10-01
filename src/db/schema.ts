@@ -153,6 +153,32 @@ export const users = pgTable(
   ],
 );
 
+/**
+ * Additional organizations a user belongs to, beyond their home organization
+ * (`users.organization_id`). The role here applies inside that organization only.
+ */
+export const organizationMembers = pgTable(
+  "organization_members",
+  {
+    id: uuid("id").primaryKey().defaultRandom(),
+    organizationId: uuid("organization_id")
+      .notNull()
+      .references(() => organizations.id, { onDelete: "cascade" }),
+    userId: uuid("user_id")
+      .notNull()
+      .references(() => users.id, { onDelete: "cascade" }),
+    role: userRole("role").notNull().default("trainer"),
+    status: userStatus("status").notNull().default("active"),
+    invitedBy: uuid("invited_by").references(() => users.id, { onDelete: "set null" }),
+    ...timestamps,
+  },
+  (t) => [
+    uniqueIndex("organization_members_unique").on(t.organizationId, t.userId),
+    index("organization_members_user_idx").on(t.userId),
+    check("organization_members_role_check", sql`${t.role} <> 'super_admin'`),
+  ],
+);
+
 export const sessions = pgTable(
   "sessions",
   {

@@ -84,6 +84,20 @@ The seed creates the **Gear Tractor** organization (Alberta timezone) and a seco
 
 `pnpm db:seed:bulk` (also run automatically on deploy, once) adds a realistic history on top of the base seed so every page and role has plenty to look at: 13 users and 8 locations at Gear Tractor, about 250 inventory records, 12 Configurations, 6 Kits, 30 Consumables, around 50 returned checkouts with damage reports, 16 active sessions (some overdue or partially returned), drafts at every step, 24 reservations, inspection history, photos and PDF attachments, plus two more tenants: **Summit Arborists** and **Northwind Rescue** (inactive). It is additive and skips itself if it has already run.
 
+### Organization switcher
+
+People can belong to more than one organization. Their home organization is `users.organization_id`; extra access lives in `organization_members` (with its own role per organization, protected by RLS). The switcher at the top of the sidebar (top bar on mobile) lists every organization the person can open; the choice is stored on the session and re-checked on every request. Inviting an email that already has an account in another organization adds a membership instead of a new account. Platform admins see every organization plus the platform console.
+
+Demo memberships (`pnpm db:seed:members`, also run on deploy):
+
+| Account | Home | Also in |
+| --- | --- | --- |
+| `dj@geartractor.app` | Gear Tractor (Admin) | Tegnol (Admin), Summit Arborists (Trainer) |
+| `admin@tegnol.agency` | Tegnol (Admin) | Gear Tractor (Admin), Summit Arborists (Admin) |
+| `sam@geartractor.app` | Gear Tractor (Trainer) | Summit Arborists (Trainer) |
+| `priya@geartractor.app` | Gear Tractor (Admin) | Tegnol (Trainer) |
+| `marcus@summitarborists.ca` | Summit Arborists (Admin) | Gear Tractor (Trainer) |
+
 ### Demo accounts
 
 | Password | Where |

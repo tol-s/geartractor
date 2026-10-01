@@ -43,7 +43,7 @@ describe("authentication", () => {
     const t = await createTenant();
     const email = `new-${uid()}@test.dev`;
     const { inviteUrl } = await inTenant(t, (tx) => inviteUser(tx, t.admin, { name: "New Person", email, role: "trainer" }));
-    const token = inviteUrl.split("/invite/")[1];
+    const token = inviteUrl!.split("/invite/")[1];
     expect((await getInvitation(token))?.valid).toBe(true);
     await expect(acceptInvitation(token, "New Person", "short")).rejects.toThrow(/at least 10/);
     await acceptInvitation(token, "New Person", "FirstPassword1");

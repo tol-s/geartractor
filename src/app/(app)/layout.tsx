@@ -1,4 +1,4 @@
-import { requireOrgContext } from "@/server/auth/context";
+import { listOrgChoices, requireOrgContext } from "@/server/auth/context";
 import { withTenant } from "@/db";
 import { ensureFreshStatuses } from "@/server/status-engine";
 import { AppShell } from "@/components/shell/app-shell";
@@ -24,6 +24,7 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
   const ctx = await requireOrgContext();
   // Time-based rules (expiry, inspection due dates) are refreshed once per day per tenant.
   await withTenant(ctx.orgId, (tx) => ensureFreshStatuses(tx, ctx.orgId));
+  const orgs = await listOrgChoices(ctx);
   const allowed = Object.entries(NAV_PERMISSIONS)
     .filter(([, p]) => ctx.can(p))
     .map(([href]) => href);
@@ -31,8 +32,9 @@ export default async function AppLayout({ children }: LayoutProps<"/">) {
     <>
       <BrandStyle primary={ctx.org.primaryColor} secondary={ctx.org.secondaryColor} accent={ctx.org.accentColor} />
       <AppShell
-        user={{ name: ctx.user.name, email: ctx.user.email, role: ctx.user.role }}
-        org={{ name: ctx.org.name, logo: ctx.org.logoDataUrl }}
+        user={{ name: ctx.user.name, email: ctx.user.email, role: ctx.isSuperAdmin ? "super_admin" : ctx.role }}
+        org={{ id: ctx.orgId, name: ctx.org.name, logo: ctx.org.logoDataUrl }}
+        orgs={orgs}
         isSuperAdmin={ctx.isSuperAdmin}
         allowed={allowed}
       >

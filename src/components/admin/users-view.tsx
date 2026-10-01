@@ -17,7 +17,7 @@ import { Dialog } from "../ui/dialog";
 import { Field, Input, NativeSelect } from "../ui/input";
 import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from "../ui/menu";
 
-type U = { id: string; name: string; email: string; role: Role; status: "active" | "invited" | "deactivated"; lastActiveAt: Date | null; createdAt: Date; inviteExpiresAt: string | null };
+type U = { id: string; name: string; email: string; role: Role; status: "active" | "invited" | "deactivated"; lastActiveAt: Date | null; createdAt: Date; inviteExpiresAt: string | null; member?: boolean };
 
 export function UsersView({ users, selfId, orgName }: { users: U[]; selfId: string; orgName: string }) {
   const [inviteOpen, setInviteOpen] = React.useState(false);
@@ -59,6 +59,7 @@ export function UsersView({ users, selfId, orgName }: { users: U[]; selfId: stri
                 <td className="px-5 py-3">
                   <span className="flex items-center gap-3 font-semibold">
                     <Avatar name={u.name} size={34} /> {u.name}
+                    {u.member && <Badge tone="neutral">Member</Badge>}
                     {u.id === selfId && <span className="text-[12px] font-medium text-muted">(you)</span>}
                   </span>
                 </td>
@@ -172,11 +173,14 @@ function InviteDialog({ open, onOpenChange, onInvited }: { open: boolean; onOpen
   const [email, setEmail] = React.useState("");
   const [role, setRole] = React.useState<"trainer" | "org_admin">("trainer");
   const invite = useAction(inviteUserAction, {
-    success: "Invitation created",
     toastErrors: false,
     onSuccess: (r) => {
       onOpenChange(false);
-      onInvited({ url: r.inviteUrl, emailed: r.emailed, email });
+      if (r.inviteUrl) {
+        toast.success("Invitation created");
+        onInvited({ url: r.inviteUrl, emailed: r.emailed, email });
+      }
+      else toast.success(`${r.name} already has an account, so they now have access here`, { id: "member-added" });
       setName("");
       setEmail("");
     },

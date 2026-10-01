@@ -40,9 +40,11 @@ export async function inviteUserAction(input: { name: string; email: string; rol
     const mail = await sendEmail({
       to: res.user.email,
       subject: `You're invited to ${ctx.org.name} on Gear Tractor`,
-      text: `Hi ${res.user.name},\n\n${ctx.user.name} invited you to ${ctx.org.name} as ${ROLE_LABEL[res.user.role]}.\nSet up your password here (valid for 7 days):\n${res.inviteUrl}`,
+      text: res.inviteUrl
+        ? `Hi ${res.user.name},\n\n${ctx.user.name} invited you to ${ctx.org.name} as ${ROLE_LABEL[res.user.role]}.\nSet up your password here (valid for 7 days):\n${res.inviteUrl}`
+        : `Hi ${res.user.name},\n\n${ctx.user.name} gave you access to ${ctx.org.name} as ${ROLE_LABEL[res.user.role]}.\nSign in with your existing account and pick ${ctx.org.name} from the organization switcher.`,
     });
-    return { inviteUrl: res.inviteUrl, emailed: mail.delivered };
+    return { inviteUrl: res.inviteUrl, emailed: mail.delivered, name: res.user.name };
   });
 }
 

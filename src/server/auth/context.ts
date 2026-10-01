@@ -1,9 +1,9 @@
 import "server-only";
 import { cache } from "react";
 import { redirect } from "next/navigation";
-import { eq } from "drizzle-orm";
+import { and, asc, eq, ne } from "drizzle-orm";
 import { withSystem } from "@/db";
-import { organizations, type OrgSettings } from "@/db/schema";
+import { organizationMembers, organizations, type OrgSettings } from "@/db/schema";
 import type { Role } from "@/lib/domain";
 import { ForbiddenError } from "../errors";
 import { getCurrentSession, type SessionUser } from "./session";
@@ -55,6 +55,71 @@ const loadOrg = cache(async (orgId: string): Promise<(OrgBranding & { status: st
   return rows[0] ?? null;
 });
 
+const loadMembership = cache(async (userId: string, orgId: string) => {
+  const rows = await withSystem((tx) =>
+    tx
+      .select({ role: organizationMembers.role })
+      .from(organizationMembers)
+      .innerJoin(organizations, eq(organizations.id, organizationMembers.organizationId))
+      .where(
+        and(
+          eq(organizationMembers.userId, userId),
+          eq(organizationMembers.organizationId, orgId),
+          eq(organizationMembers.status, "active"),
+          eq(organizations.status, "active"),
+        ),
+      )
+      .limit(1),
+  );
+  return rows[0] ?? null;
+});
+
+export type OrgChoice = {
+  id: string;
+  name: string;
+  logo: string | null;
+  color: string;
+  role: Role;
+  status: "active" | "inactive";
+};
+
+/**
+ * Organizations the signed-in user can switch between: their home organization plus active
+ * memberships. Platform admins see every organization.
+ */
+export async function listOrgChoices(ctx: Pick<OrgContext, "user" | "isSuperAdmin">): Promise<OrgChoice[]> {
+  return withSystem(async (tx) => {
+    const cols = {
+      id: organizations.id,
+      name: organizations.name,
+      logo: organizations.logoDataUrl,
+      color: organizations.primaryColor,
+      status: organizations.status,
+    };
+    if (ctx.isSuperAdmin) {
+      const rows = await tx.select(cols).from(organizations).orderBy(asc(organizations.name));
+      return rows.map((r) => ({ ...r, role: "super_admin" as Role }));
+    }
+    const home = ctx.user.organizationId
+      ? await tx.select(cols).from(organizations).where(eq(organizations.id, ctx.user.organizationId))
+      : [];
+    const extra = await tx
+      .select({ ...cols, role: organizationMembers.role })
+      .from(organizationMembers)
+      .innerJoin(organizations, eq(organizations.id, organizationMembers.organizationId))
+      .where(
+        and(
+          eq(organizationMembers.userId, ctx.user.id),
+          eq(organizationMembers.status, "active"),
+          eq(organizations.status, "active"),
+          ctx.user.organizationId ? ne(organizations.id, ctx.user.organizationId) : undefined,
+        ),
+      )
+      .orderBy(asc(organizations.name));
+    return [...home.map((r) => ({ ...r, role: ctx.user.role })), ...extra];
+  });
+}
+
 /**
  * Resolves the organization context from the authenticated session only.
  * The organization id is never accepted from the client.
@@ -63,12 +128,21 @@ export const getOrgContext = cache(async (): Promise<OrgContext | null> => {
   const session = await getCurrentSession();
   if (!session) return null;
   const isSuperAdmin = session.user.role === "super_admin";
-  const orgId = isSuperAdmin ? session.activeOrganizationId : session.user.organizationId;
+  let orgId = isSuperAdmin ? session.activeOrganizationId : session.user.organizationId;
+  let role: Role = isSuperAdmin ? "org_admin" : session.user.role;
+  // A member of several organizations works in the one selected in their session. The membership
+  // is re-checked on every request, so revoked access falls back to the home organization.
+  if (!isSuperAdmin && session.activeOrganizationId && session.activeOrganizationId !== orgId) {
+    const membership = await loadMembership(session.user.id, session.activeOrganizationId);
+    if (membership) {
+      orgId = session.activeOrganizationId;
+      role = membership.role;
+    }
+  }
   if (!orgId) return null;
   const org = await loadOrg(orgId);
   if (!org) return null;
   if (org.status !== "active" && !isSuperAdmin) return null;
-  const role: Role = isSuperAdmin ? "org_admin" : session.user.role;
   const permissions = permissionsFor(role, org.settings);
   const { status: _s, ...branding } = org;
   void _s;

@@ -23,6 +23,7 @@ import { adjustStock, lockStock } from "./consumables";
 import { getAncestors, getDescendants, getItemOrThrow } from "./inventory";
 import { ensureFreshStatuses, orgToday, recomputeOrgStatuses } from "./status-engine";
 import { resolveScan } from "./qr";
+import { isActiveOrgUser } from "./users";
 
 type Ctx = Pick<OrgContext, "orgId" | "user" | "can" | "org">;
 
@@ -319,12 +320,9 @@ export async function updateDraftDetails(
     if (userId !== ctx.user.id && !ctx.can("checkout.assign_user")) {
       throw new ForbiddenError("You can only check out equipment for yourself.");
     }
-    const [u] = await tx
-      .select({ id: users.id, status: users.status })
-      .from(users)
-      .where(and(eq(users.id, userId), eq(users.organizationId, ctx.orgId)));
-    if (!u && userId !== ctx.user.id) throw new AppError("Invalid user", "Select an active trainer or user.", "validation");
-    if (u && u.status !== "active") throw new AppError("User inactive", "This user is not active.", "validation");
+    if (userId !== ctx.user.id && !(await isActiveOrgUser(tx, ctx.orgId, userId))) {
+      throw new AppError("Invalid user", "Select an active trainer or user.", "validation");
+    }
     patch.userId = userId;
   } else if (input.step === 3) {
     if (!input.locationId) throw new AppError("Location required", "Select the storage location.", "validation");
